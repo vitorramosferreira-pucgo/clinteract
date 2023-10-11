@@ -10,3 +10,5 @@ para compilar o Servidor, abra o terminal, vá ao diretório da pasta Servidor e
 gcc main.c libsocket.c -o CLInteract-servidor -pthread -w
 
 O servidor é executado em localhost e IP alocado a máquina em execução do serviço.
+
+O cliente deve rodar na mesma rede que o servidor para funcionar corretamente.
