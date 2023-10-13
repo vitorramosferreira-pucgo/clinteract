@@ -77,7 +77,7 @@ void receberMensagem(int socketClienteDesc) {
         if(tamanhoMensagem > 0)
         {
             mensagem[tamanhoMensagem] = 0;
-            printf("Resposta do cliente: %s\n", mensagem);
+            printf("%s\n", mensagem);
         }
         if(tamanhoMensagem == 0)
             break;
