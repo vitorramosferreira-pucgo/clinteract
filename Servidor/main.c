@@ -49,12 +49,12 @@ int main() {
     // VER--->>criarEnderecoIpv4 em libsocket.c
     struct sockaddr_in *enderecoServidor = criarEnderecoIpv4("", 2000);
 
-    // MAPEIA O SOCKET CONFIGURADO, AO DESCRITOR DE ARQUIVO CRIADO PARA O SERVIDOR
+    // MAPEIA O PACOTE DO SERVIDOR COM O ENDERECO DO SERVIDOR NO SISTEMA OPERACIONAL
     int resultado = bind(socketServidorDesc, enderecoServidor, sizeof (*enderecoServidor));
 
     if(resultado == 0)
         printf("\nCLInteract 1.0 (Servidor) - (Terminar Processo: Ctrl+C)\n");
-    // INICIA O PROCESSO DE ESCUTA PARA O DESCRITOR DE ARQUIVO SELECIONADO
+    // INICIA O PROCESSO DE ESCUTA PARA O DESCRITOR DE ARQUIVO DO SERVIDOR
     listen(socketServidorDesc, 20);
     
     // RECEBE AS SOLICITACOES DE CONEXAO  VER--->>receberConexaoRemota
