@@ -1,5 +1,5 @@
 
-//Interact-cliente - Vitor Ramos Ferreira
+//Interact-cliente GTK - Vitor Ramos Ferreira
 
 #include <gtk/gtk.h>
 #include <stdbool.h>
