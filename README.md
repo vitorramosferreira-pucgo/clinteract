@@ -1,5 +1,6 @@
-# clinteract
+# clinteract (Linux)
 Implementação de Sockets em C para apresentação de trabalho em Sistemas Distribuidos
+
 
 para compilar o Cliente, abra o terminal, vá ao diretório da pasta Cliente e execute o seguinte comando:
 
