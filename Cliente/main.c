@@ -1,3 +1,6 @@
+
+//Interact-cliente - Vitor Ramos Ferreira
+
 #include <gtk/gtk.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -22,10 +25,8 @@ void enviarMensagem(GtkWidget *widget, gpointer data) {
         sprintf(mensagem, "%s: %s\n", nome, text);
         send(socketClienteDesc, mensagem, strlen(mensagem), 0);
 
-        // Clear the entry after sending the message
         gtk_entry_set_text(GTK_ENTRY(entry), "");
 
-        // Display the sent message in the chat history
         GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(chat_view));
         gtk_text_buffer_insert_at_cursor(buffer, mensagem, -1);
         GtkTextIter iter;
@@ -42,7 +43,6 @@ void receberMensagem() {
         if (tamanhoMensagem > 0) {
             mensagem[tamanhoMensagem] = 0;
 
-            // Display the received message in the chat history
             GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(chat_view));
             GtkTextIter iter;
             gtk_text_buffer_get_end_iter(buffer, &iter);
@@ -118,15 +118,12 @@ void obterEnderecoEServidor() {
 
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
-    // Entry for IP address
     ip_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(ip_entry), "Endereço IP do Servidor");
 
-    // Entry for port number
     port_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(port_entry), "Número da Porta do Servidor");
 
-    // Pack entries into content area
     gtk_container_add(GTK_CONTAINER(content_area), ip_entry);
     gtk_container_add(GTK_CONTAINER(content_area), port_entry);
 
@@ -138,7 +135,6 @@ void obterEnderecoEServidor() {
         char *enderecoIP = g_strdup(gtk_entry_get_text(GTK_ENTRY(ip_entry)));
         int porta = atoi(gtk_entry_get_text(GTK_ENTRY(port_entry)));
 
-        // Connect to the server
         socketClienteDesc = criarSocketIpv4Tcp();
         struct sockaddr_in *enderecoServidor = criarEnderecoIpv4(enderecoIP, porta);
         connect(socketClienteDesc, enderecoServidor, sizeof *enderecoServidor);
@@ -157,47 +153,61 @@ void mainSendButtonActivate(GtkWidget *widget, gpointer data) {
 }
 
 int main(int argc, char *argv[]) {
+
+    //INICIA UMA INSTÂNCIA GTK
     gtk_init(&argc, &argv);
 
+    //OBTEM O ENDEREÇO IP E PORTA DO SERVIDOR DO USUÁRIO
     obterEnderecoEServidor();
+
+    //OBTEM A ENTRADA DO NOME DO USUÁRIO
     obterNome();
 
+    //CRIA UMA JANELA GTK COM O TÍTULO "Interact 2.0 (Cliente)"
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Interact 2.0 (Cliente)");
     gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
     g_signal_connect(window, "destroy", G_CALLBACK(fecharJanela), NULL);
 
+    //POSICIONA A JANELA PRINCIPAL NO CENTRO DA TELA
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
-    // Create a scrolled window to make the text view scrollable
+    //CRIA UMA JANELA COM O RECURSO DE ROLAGEM
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
+    //CRIA UMA ÁREA DE TEXTO PARA EXIBIR AS MENSAGENS DENTRO DA AREA DE ROLAGEM
     chat_view = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(chat_view), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(chat_view), GTK_WRAP_WORD_CHAR);
 
+    //CRIA UMA CAIXA DE TEXTO PARA ENTRADA DE MENSAGENS
     entry = gtk_entry_new();
     GtkWidget *send_button = gtk_button_new_with_label("Enviar");
 
-    // Connect "activate" signal to mainSendButtonActivate
+    //CONECTA OS SINAIS "activate" E "clicked" DA CAIXA DE TEXTO E DO BOTÃO DE ENVIAR
+    //E ATIVA A FUNÇÃO mainSendButtonActivate QUANDO O USUÁRIO PRESSIONA A TECLA ENTER OU O BOTÃO DE ENVIAR
+    //NO MOMENTO DE ENVIO DA MENSAGEM
     g_signal_connect(entry, "activate", G_CALLBACK(mainSendButtonActivate), NULL);
     g_signal_connect(send_button, "clicked", G_CALLBACK(mainSendButtonActivate), NULL);
 
+    //CRIA UM CONTAINER PARA ACOMODAR A ÁREA DE TEXTO, A JANELA DE ROLAGEM E A CAIXA DE ENTRADA DE MENSAGENS
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
-    // Pack the text view into the scrolled window
+    //ADICIONA OS WIDGETS AO CONTAINER
     gtk_container_add(GTK_CONTAINER(scrolled_window), chat_view);
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
-
     gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), send_button, FALSE, TRUE, 0);
-
     gtk_container_add(GTK_CONTAINER(window), vbox);
+
+    //MOSTRA TODOS OS WIDGETS
     gtk_widget_show_all(window);
 
+    //INICIA A THREAD PARA RECEBER AS MENSAGENS DO SERVIDOR
     threadBroadcastReceberMensagem();
 
+    //INICIA O LOOP PRINCIPAL DA APLICAÇÃO
     gtk_main();
 
     return 0;
